@@ -1,0 +1,483 @@
+/* ================================================================
+   Device_Tch  v2.0  —  Style
+   Base: Technolab glassmorphism theme
+   Added: Timer cards, day picker, next-timer bar, section titles
+   ================================================================ */
+
+/* ── Variables ─────────────────────────────────────────────────── */
+:root {
+    --bg-gradient    : linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --glass-bg       : rgba(255, 255, 255, 0.72);
+    --glass-border   : 1px solid rgba(255, 255, 255, 0.55);
+    --text-main      : #1d1d1f;
+    --text-sub       : #86868b;
+    --accent-blue    : #0071e3;
+    --accent-green   : #34c759;
+    --accent-orange  : #ff9f0a;
+    --accent-red     : #ff3b30;
+    --shadow         : 0 8px 32px rgba(31, 38, 135, 0.08);
+    --radius-lg      : 22px;
+    --radius-md      : 14px;
+    --radius-sm      : 10px;
+}
+
+/* ── Reset ──────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    padding: 20px 16px 40px;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────── */
+.main-wrapper {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* ── Loading overlay ────────────────────────────────────────────── */
+.loading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+}
+.spinner {
+    width: 42px; height: 42px;
+    border: 3px solid #e5e5ea;
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.glass-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    border: var(--glass-border);
+    box-shadow: var(--shadow);
+}
+.brand          { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand-logo     { height: 44px; width: auto; border-radius: 8px; flex-shrink: 0; }
+.brand-text h1  { font-size: 17px; font-weight: 700; text-transform: lowercase; }
+.brand-text p   { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+
+/* ── Header action buttons (right side) ─────────────────────────── */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;   /* never compressed by brand text */
+}
+.header-btn {
+    background: rgba(0,0,0,0.05);
+    border: none;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--text-main);
+    font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+}
+.header-btn:hover { background: rgba(0,0,0,0.12); }
+.header-btn-logout {
+    background: none;
+    border: 1.5px solid #e5e5ea;
+    color: var(--text-sub);
+}
+.header-btn-logout:hover { border-color: var(--accent-red); color: var(--accent-red); background: none; }
+
+/* legacy alias (kept for any cached references) */
+.settings-btn   { background: rgba(0,0,0,0.05); border: none;
+    width: 40px; height: 40px; border-radius: 50%;
+    cursor: pointer; color: var(--text-main); font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s; }
+.settings-btn:hover { background: rgba(0,0,0,0.1); }
+
+.device-id {
+    display: none;
+}
+
+/* ── Status bar ─────────────────────────────────────────────────── */
+.status-bar {
+    text-align: center; font-size: 13px;
+    color: var(--text-sub); font-weight: 500;
+}
+.dot {
+    height: 8px; width: 8px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    display: inline-block; margin-right: 6px;
+}
+
+/* ── Time bar ───────────────────────────────────────────────────── */
+.time-bar {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-sub);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+#currentTime {
+    font-weight: 600;
+    color: var(--text-main);
+    margin-left: 4px;
+}
+
+/* ── Section titles ─────────────────────────────────────────────── */
+.section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-sub);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 4px 0;
+}
+
+/* ── Glass card (config, modal) ─────────────────────────────────── */
+.glass-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: var(--glass-border);
+}
+.glass-card h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Inputs ─────────────────────────────────────────────────────── */
+input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid #e5e5ea;
+    background: #f9f9fb;
+    font-size: 14px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+    color: var(--text-main);
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* ── CTA Button ─────────────────────────────────────────────────── */
+.cta-button {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--accent-blue);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.cta-button:hover   { opacity: 0.88; }
+.cta-button:active  { transform: scale(0.98); }
+
+.add-timer-btn {
+    background: var(--accent-green);
+    margin-bottom: 4px;
+}
+
+/* ── Relay control grid ─────────────────────────────────────────── */
+.control-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+@media (min-width: 460px) {
+    .control-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Relay device cards ─────────────────────────────────────────── */
+.device-card {
+    background: rgba(255,255,255,0.82);
+    border-radius: var(--radius-md);
+    padding: 18px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    border: var(--glass-border);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    transition: border-color 0.25s, background 0.25s;
+}
+.device-card.active {
+    background: white;
+    border-color: var(--accent-green);
+}
+.device-info { display: flex; flex-direction: column; gap: 4px; }
+.icon-box {
+    width: 32px; height: 32px;
+    background: #f2f2f7;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-sub);
+    margin-bottom: 4px; transition: 0.25s;
+}
+.device-card.active .icon-box  { background: var(--accent-green); color: white; }
+.device-name   { font-weight: 700; font-size: 15px; }
+.device-status { font-size: 12px; color: var(--text-sub); }
+.device-card.active .device-status { color: var(--accent-green); }
+
+/* ── Toggle switch ──────────────────────────────────────────────── */
+.switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; inset: 0;
+    background: #e5e5ea; border-radius: 34px;
+    cursor: pointer; transition: 0.35s;
+}
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 26px; height: 26px;
+    left: 2px; bottom: 2px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+    transition: 0.35s;
+}
+input:checked + .slider           { background: var(--accent-green); }
+input:checked + .slider::before   { transform: translateX(20px); }
+
+/* ── Timer cards ────────────────────────────────────────────────── */
+.timer-card {
+    background: rgba(255,255,255,0.82);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    border: var(--glass-border);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    display: flex; flex-direction: column; gap: 8px;
+}
+.timer-card.active-timer   { border-color: var(--accent-green); }
+.timer-card.inactive-timer { border-color: var(--accent-orange); }
+
+.timer-relay-label {
+    font-weight: 700; font-size: 15px;
+}
+.timer-meta {
+    font-size: 12px; color: var(--text-sub);
+    display: flex; align-items: center; gap: 6px;
+}
+.timer-actions {
+    display: flex; gap: 8px; margin-top: 4px;
+}
+.btn-edit {
+    flex: 1; padding: 9px;
+    border-radius: var(--radius-sm);
+    border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600;
+    background: #f2f2f7; color: var(--text-main);
+    transition: background 0.2s;
+}
+.btn-edit:hover { background: #e5e5ea; }
+.btn-delete {
+    flex: 1; padding: 9px;
+    border-radius: var(--radius-sm);
+    border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600;
+    background: #fff0f0; color: var(--accent-red);
+    transition: background 0.2s;
+}
+.btn-delete:hover { background: #ffe0e0; }
+
+/* ── Next timer banner ──────────────────────────────────────────── */
+.next-timer-bar {
+    background: linear-gradient(135deg, #fff8ec 0%, #ffecd2 100%);
+    border: 1.5px solid var(--accent-orange);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7a4f00;
+    text-align: center;
+}
+
+/* ── Days grid picker ───────────────────────────────────────────── */
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 4px;
+}
+.day-box {
+    padding: 8px 2px;
+    text-align: center;
+    border: 1.5px solid #e5e5ea;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: 0.2s;
+    user-select: none;
+}
+.day-box:hover        { border-color: var(--accent-blue); }
+.day-box.active       { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+.day-box input        { display: none; }
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+.glass-footer {
+    text-align: center; padding: 14px;
+    color: var(--text-sub); font-size: 12px;
+    background: rgba(255,255,255,0.4);
+    border-radius: var(--radius-md);
+}
+
+/* ── Modals ─────────────────────────────────────────────────────── */
+.modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.38);
+    backdrop-filter: blur(5px);
+    z-index: 200;
+    justify-content: center; align-items: center;
+}
+.modal-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    width: 92%;
+    max-width: 400px;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1.5px solid #f2f2f7;
+}
+.modal-header h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.close-btn {
+    background: #ff3b30; color: white;
+    border: none; width: 30px; height: 30px;
+    border-radius: 50%; font-size: 18px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+.close-btn:hover { background: #d32f2f; }
+
+/* ── Empty state ────────────────────────────────────────────────── */
+.empty-state {
+    text-align: center; padding: 30px;
+    color: var(--text-sub); font-size: 14px;
+    grid-column: span 2;
+}
+.empty-state i { font-size: 32px; display: block; margin-bottom: 10px; }
+
+/* ── Badge (action label) ───────────────────────────────────────── */
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+.badge-on  { background: #e8f9ee; color: #1a7a35; }
+.badge-off { background: #fff0f0; color: #c0392b; }
+
+/* ── Auth / Login card ──────────────────────────────────────────── */
+.auth-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    border: var(--glass-border);
+}
+.auth-card h2 {
+    font-size: 18px; font-weight: 700;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+}
+.auth-card .auth-sub {
+    font-size: 12px; color: var(--text-sub);
+    margin-bottom: 20px;
+}
+.auth-error {
+    background: #fff0f0;
+    border: 1.5px solid var(--accent-red);
+    color: var(--accent-red);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: none;
+}
+.logout-btn {
+    background: none; border: 1.5px solid #e5e5ea;
+    color: var(--text-sub); border-radius: 50%;
+    width: 38px; height: 38px;
+    cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+}
+.logout-btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+/* ── User + Device badge bar ────────────────────────────────────── */
+.user-badge {
+    font-size: 11px; color: var(--text-sub);
+    display: flex; justify-content: center; align-items: center;
+    gap: 10px; flex-wrap: wrap;
+    margin-top: -6px;
+}
+.device-chip {
+    background: #f2f2f7;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: var(--text-sub);
+    font-family: 'SF Mono', monospace;
+    letter-spacing: 0.2px;
+}
+
+/* ── Relay key label (small, below relay name) ───────────────────── */
+.device-key {
+    font-size: 10px;
+    color: #aeaeb2;
+    font-family: 'SF Mono', monospace;
+}
+
+/* ── Form label hint ────────────────────────────────────────────── */
+.label-hint {
+    font-weight: 400;
+    text-transform: none;
+    font-size: 11px;
+    color: #aeaeb2;
+    letter-spacing: 0;
+}

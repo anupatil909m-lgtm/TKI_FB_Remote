@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecKnow Inventors Smart Home</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="main-wrapper">
+
+        <!-- ── Header ──────────────────────────────────────────── -->
+        <header class="glass-header">
+            <div class="brand">
+                <a href="index.html">
+                    <img src="logo2.png" class="brand-logo">
+                </a>
+            </div>
+            <!-- Right-side action buttons (both hidden until signed in) -->
+            <div class="header-actions">
+                <button class="header-btn" id="settingsBtn"
+                        onclick="showCredentialsModal()" title="Settings"
+                        style="display:none;">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+                <button class="header-btn header-btn-logout" id="logoutBtn"
+                        onclick="signOut()" title="Sign Out"
+                        style="display:none;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- User + Device badge (shown after sign-in) -->
+        <div class="user-badge" id="userBadge" style="display:none;"></div>
+
+        <!-- Status Bar (visible pre-auth — status node is public) -->
+        <div class="status-bar" id="connectionStatus" style="display:none;">
+            <span class="dot"></span> System Ready
+        </div>
+        <p id="lastSeen" style="text-align:center; font-size:0.85rem; color:#86868b;
+                                 margin-top:4px; margin-bottom:0; display:none;">
+            Waiting for device signal...
+        </p>
+
+        <!-- IST Clock -->
+        <div class="time-bar" id="timeBar" style="display:none;">
+            <i class="fas fa-clock"></i>
+            <span id="currentTime">--:--:--</span>
+            <span style="font-size:0.75rem; color:#86868b; margin-left:6px;">(IST)</span>
+        </div>
+
+        <!-- ── STEP 1 : Firebase Config (first visit) ─────────── -->
+        <div class="glass-card config-card" id="configSection">
+            <h2><i class="fas fa-link"></i> Connect Firebase</h2>
+            <form id="configForm">
+                <label>API Key</label>
+                <input type="password" id="apiKey"
+                       placeholder="Firebase Web API Key" required>
+                <label>Database URL</label>
+                <input type="url" id="databaseURL"
+                       placeholder="https://your-project-rtdb.firebaseio.com" required>
+                <label>User ID <span class="label-hint">(Firebase Auth UID)</span></label>
+                <input type="text" id="userId"
+                       placeholder="e.g. y5JSNNcsQ1aJQHp13YkjJD1AHFr2" required>
+                <label>Device ID <span class="label-hint">(unique device key)</span></label>
+                <input type="text" id="deviceId"
+                       placeholder="e.g. d99fcd22c9114ef4" required>
+                <button type="submit" class="cta-button">
+                    <i class="fas fa-plug"></i> Continue to Sign In
+                </button>
+            </form>
+        </div>
+
+        <!-- ── STEP 2 : Email / Password Login ───────────────── -->
+        <div class="auth-card" id="loginSection" style="display:none;">
+            <h2><i class="fas fa-lock"></i> Sign In</h2>
+            <p class="auth-sub">Enter your Firebase Authentication credentials</p>
+            <div class="auth-error" id="loginError"></div>
+            <form id="loginForm">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="Email address" required>
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit" class="cta-button">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+        </div>
+
+        <!-- Relay Controls -->
+        <div id="relaysSection" style="display:none;">
+            <div class="section-title">
+                <i class="fas fa-toggle-on"></i> Relay Controls
+            </div>
+            <div id="relaysContainer" class="control-grid"></div>
+        </div>
+
+        <!-- Timer Management -->
+        <div id="timersSection" style="display:none;">
+            <div class="section-title">
+                <i class="fas fa-clock"></i> Timer Management
+            </div>
+            <div class="next-timer-bar" id="nextTimer">
+                <i class="fas fa-info-circle"></i> No upcoming timers scheduled
+            </div>
+            <button class="cta-button add-timer-btn" onclick="openTimerModal()">
+                <i class="fas fa-plus"></i> Add Timer
+            </button>
+            <div id="timersContainer" class="control-grid"></div>
+        </div>
+
+        <footer class="glass-footer">
+            <p>Designed by TecKnow Inventors</p>
+        </footer>
+    </div>
+
+    <!-- ── Timer Modal ─────────────────────────────────────────── -->
+    <div id="timerModal" class="modal-backdrop"
+         onclick="handleModalBackdropClick(event,'timerModal')">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-clock"></i> Add Timer</h3>
+                <button class="close-btn" onclick="closeTimerModal()">&times;</button>
+            </div>
+            <form id="timerForm">
+                <label>Relay</label>
+                <select id="timerRelay" required>
+                    <option value="">Select relay...</option>
+                </select>
+                <label>Action</label>
+                <select id="timerAction" required>
+                    <option value="">Select action...</option>
+                    <option value="ON">Turn ON</option>
+                    <option value="OFF">Turn OFF</option>
+                </select>
+                <label>Start Time</label>
+                <input type="time" id="timerStartTime" required>
+                <label>End Time
+                    <span style="font-size:0.8em;color:#86868b;">(optional)</span>
+                </label>
+                <input type="time" id="timerEndTime">
+                <label>Active Days</label>
+                <div class="days-grid">
+                    <div class="day-box" onclick="toggleDay(0)">
+                        <input type="checkbox" id="day0"><span>Mon</span></div>
+                    <div class="day-box" onclick="toggleDay(1)">
+                        <input type="checkbox" id="day1"><span>Tue</span></div>
+                    <div class="day-box" onclick="toggleDay(2)">
+                        <input type="checkbox" id="day2"><span>Wed</span></div>
+                    <div class="day-box" onclick="toggleDay(3)">
+                        <input type="checkbox" id="day3"><span>Thu</span></div>
+                    <div class="day-box" onclick="toggleDay(4)">
+                        <input type="checkbox" id="day4"><span>Fri</span></div>
+                    <div class="day-box" onclick="toggleDay(5)">
+                        <input type="checkbox" id="day5"><span>Sat</span></div>
+                    <div class="day-box" onclick="toggleDay(6)">
+                        <input type="checkbox" id="day6"><span>Sun</span></div>
+                </div>
+                <button type="submit" class="cta-button" style="margin-top:16px;">
+                    <i class="fas fa-save"></i> Save Timer
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Settings Modal ─────────────────────────────────────── -->
+    <div id="credentialsModal" class="modal-backdrop"
+         onclick="handleModalBackdropClick(event,'credentialsModal')">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Settings</h3>
+                <button class="close-btn" onclick="closeCredentialsModal()">&times;</button>
+            </div>
+            <form id="credentialsForm">
+                <label>Firebase API Key</label>
+                <input type="password" id="newApiKey" required>
+                <label>Database URL</label>
+                <input type="url" id="newDatabaseURL" required>
+                <label>User ID <span class="label-hint">(Firebase Auth UID)</span></label>
+                <input type="text" id="newUserId" required>
+                <label>Device ID <span class="label-hint">(unique device key)</span></label>
+                <input type="text" id="newDeviceId" required>
+                <button type="submit" class="cta-button">
+                    <i class="fas fa-sync"></i> Save &amp; Reload
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <!-- Moment.js + IST timezone -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.40/moment-timezone-with-data.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
